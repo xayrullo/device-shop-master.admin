@@ -1,5 +1,5 @@
-describe('Example TEST', () => {
-  it('First Test', () => {
-    expect(2 + 5).toBe(7)
-  })
-})
+describe("Example TEST", () => {
+  it("First Test", () => {
+    expect(2 + 5).toBe(7);
+  });
+});

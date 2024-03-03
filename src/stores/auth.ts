@@ -76,6 +76,9 @@ export const useAuthStore = defineStore({
 
     verifyAuth() {
       if (JwtService.getToken()) {
+        // console.log("loremIpsum");
+
+        return;
       } else this.purgeAuth();
     },
   },
