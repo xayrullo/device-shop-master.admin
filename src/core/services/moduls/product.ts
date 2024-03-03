@@ -10,6 +10,27 @@ export default class ApiProduct extends ApiService {
       return res.data;
     });
   }
+
+  getAllBySearching(query?: any): Promise<IProductBody> {
+    return ApiService.getAll("/products/search", { params: query }).then(
+      (res) => {
+        return res.data;
+      },
+    );
+  }
+
+  getAllByCategory(param: string): Promise<IProductBody> {
+    return ApiService.getAll(`/products/category/${param}`, {}).then((res) => {
+      return res.data;
+    });
+  }
+
+  getCategories(): Promise<string[]> {
+    return ApiService.getAll("/products/categories", {}).then(
+      (res) => res.data,
+    );
+  }
+
   create(payload: IProductPost) {
     ApiService.setHeader();
     return ApiService.post("/products", { data: payload }).then((res) => {

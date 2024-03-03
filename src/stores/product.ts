@@ -33,16 +33,39 @@ export const useProductStore = defineStore({
       if (JSON.stringify(this.queryParam) === JSON.stringify(query)) {
         return;
       } else {
-        $api.product.getAll(query).then((res) => {
-          this.queryParam = { ...query };
-          this.products = res.products;
-          this.pagination = {
-            limit: res.limit,
-            skip: res.skip,
-            total: res.total,
-            current: Math.floor(res.skip / res.limit) + 1,
-          };
-        });
+        if (query.search) {
+          $api.product.getAllBySearching({ q: query.search }).then((res) => {
+            this.queryParam = { ...query };
+            this.products = res.products;
+            this.pagination = {
+              limit: res.limit,
+              skip: res.skip,
+              total: res.total,
+              current: Math.floor(res.skip / res.limit) + 1,
+            };
+          });
+        } else if (query.category) {
+          $api.product.getAllByCategory(query.category).then((res) => {
+            this.queryParam = { ...query };
+            this.products = res.products;
+            this.pagination = {
+              limit: res.limit,
+              skip: res.skip,
+              total: res.total,
+              current: Math.floor(res.skip / res.limit) + 1,
+            };
+          });
+        } else
+          $api.product.getAll(query).then((res) => {
+            this.queryParam = { ...query };
+            this.products = res.products;
+            this.pagination = {
+              limit: res.limit,
+              skip: res.skip,
+              total: res.total,
+              current: Math.floor(res.skip / res.limit) + 1,
+            };
+          });
       }
     },
     // addProduct(e: IProductPost) {
