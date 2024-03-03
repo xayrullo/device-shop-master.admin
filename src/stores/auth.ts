@@ -29,17 +29,22 @@ export const useAuthStore = defineStore({
   }),
   getters: {},
   actions: {
-    setAuth(authUser: any) {
+    getAuthMe() {
+      ApiService.setHeader();
+      return ApiService.get("/auth/me").then((res) => {
+        this.user = res.data;
+      });
+    },
+    setAuth(token: any) {
       this.isAuthenticated = true;
       this.response = {
         code: 0,
         success: true,
         message: "",
-        data: authUser,
+        data: null,
       };
-      delete authUser.token;
-      this.user = { ...authUser };
-      JwtService.saveToken(authUser.token);
+      JwtService.saveToken(token);
+      this.getAuthMe();
     },
 
     setError(error: IResponse) {
@@ -56,7 +61,7 @@ export const useAuthStore = defineStore({
     login(credentials: { username: string; password: string }) {
       return ApiService.post("/auth/login", credentials)
         .then((data) => {
-          this.setAuth(data);
+          this.setAuth(data.data.token);
         })
         .catch((err) => {
           this.setError(err);
@@ -69,9 +74,7 @@ export const useAuthStore = defineStore({
 
     verifyAuth() {
       if (JwtService.getToken()) {
-        // console.log("loremIpsum");
-
-        return;
+        this.setAuth(JwtService.getToken());
       } else this.purgeAuth();
     },
   },
