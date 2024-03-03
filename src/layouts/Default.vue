@@ -233,7 +233,7 @@ import {
   Bars3Icon,
   HomeIcon,
   XMarkIcon,
-  BanknotesIcon,
+  RectangleStackIcon,
 } from "@heroicons/vue/24/outline";
 import { ChevronDownIcon } from "@heroicons/vue/20/solid";
 
@@ -244,7 +244,18 @@ const router = useRouter();
 const route = useRoute();
 const authStore = useAuthStore();
 const navigation = [
-  { name: "Dashboard", to: "/dashboard", icon: HomeIcon, current: true },
+  {
+    name: "Dashboard",
+    to: "/dashboard",
+    icon: HomeIcon,
+    current: route.path === "/dashboard" ? true : false,
+  },
+  {
+    name: "Products",
+    to: "/products",
+    icon: RectangleStackIcon,
+    current: route.path === "/products" ? true : false,
+  },
 ];
 
 const sidebarOpen = ref(false);
