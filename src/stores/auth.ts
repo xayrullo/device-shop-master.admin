@@ -29,12 +29,6 @@ export const useAuthStore = defineStore({
   }),
   getters: {},
   actions: {
-    getAuthMe() {
-      // ApiService.setHeader()
-      // ApiService.get("/auth/me").then(res => {
-      //   console.log()
-      // })
-    },
     setAuth(authUser: any) {
       this.isAuthenticated = true;
       this.response = {
@@ -43,8 +37,9 @@ export const useAuthStore = defineStore({
         message: "",
         data: authUser,
       };
+      delete authUser.token;
+      this.user = { ...authUser };
       JwtService.saveToken(authUser.token);
-      this.getAuthMe();
     },
 
     setError(error: IResponse) {
@@ -59,15 +54,13 @@ export const useAuthStore = defineStore({
     },
 
     login(credentials: { username: string; password: string }) {
-      return new Promise((resolve, reject) => {
-        ApiService.post("/auth/login", credentials)
-          .then((data) => {
-            this.setAuth(data);
-          })
-          .catch((err) => {
-            this.setError(err);
-          });
-      });
+      return ApiService.post("/auth/login", credentials)
+        .then((data) => {
+          this.setAuth(data);
+        })
+        .catch((err) => {
+          this.setError(err);
+        });
     },
 
     logout() {
