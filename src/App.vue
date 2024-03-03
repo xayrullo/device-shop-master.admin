@@ -5,4 +5,6 @@
 import { RouterView } from "vue-router";
 </script>
 
-<style scoped></style>
+<style lang="scss">
+@import "element-plus/dist/index.css";
+</style>
