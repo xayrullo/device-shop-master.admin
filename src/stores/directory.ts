@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-
+import type IPersistStrategy from "@/core/models";
 import { $api } from "@/core/services";
 
 export interface IState {
@@ -15,9 +15,21 @@ export const useDirectoryStore = defineStore({
   },
   actions: {
     fetchCategories() {
-      $api.product.getCategories().then((res) => {
-        this.categories = res;
-      });
+      if (this.categories.length > 0) return;
+      else
+        $api.product.getCategories().then((res) => {
+          this.categories = res;
+        });
     },
   },
+  // persist: {
+  //   enabled: true,
+  //   strategies: [
+  //     {
+  //       key: "directoryStore",
+  //       storage: sessionStorage,
+  //       paths: ["categories"],
+  //     },
+  //   ] as IPersistStrategy<IState>[],
+  // },
 });

@@ -29,11 +29,13 @@ export const useAuthStore = defineStore({
   }),
   getters: {},
   actions: {
-    getAuthMe() {
+    async getAuthMe() {
       ApiService.setHeader();
-      return ApiService.get("/auth/me").then((res) => {
-        this.user = res.data;
-      });
+      return ApiService.get("/auth/me")
+        .then((res) => {
+          this.user = res.data;
+        })
+        .catch(() => this.purgeAuth);
     },
     setAuth(token: any) {
       this.isAuthenticated = true;

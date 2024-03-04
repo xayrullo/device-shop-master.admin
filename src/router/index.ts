@@ -49,29 +49,21 @@ const routes: Array<RouteRecordRaw> = [
       },
     ],
   },
-  //   {
-  //     path: "/",
-  //     component: () => import("@/layouts/SystemLayout.vue"),
-  //     children: [
-  //       {
-  //         // the 404 route, when none of the above matches
-  //         path: "/404",
-  //         name: "404",
-  //         component: () => import("@/views/crafted/authentication/Error404.vue"),
-  //         meta: {
-  //           pageTitle: "Error 404",
-  //         },
-  //       },
-  //       {
-  //         path: "/500",
-  //         name: "500",
-  //         component: () => import("@/views/crafted/authentication/Error500.vue"),
-  //         meta: {
-  //           pageTitle: "Error 500",
-  //         },
-  //       },
-  //     ],
-  //   },
+  {
+    path: "/",
+    component: () => import("@/layouts/Auth.vue"),
+    children: [
+      {
+        // the 404 route, when none of the above matches
+        path: "/404",
+        name: "404",
+        component: () => import("@/views/Error404.vue"),
+        meta: {
+          pageTitle: "Error 404",
+        },
+      },
+    ],
+  },
   {
     path: "/:pathMatch(.*)*",
     redirect: "/404",

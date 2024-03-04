@@ -209,10 +209,10 @@ const onSubmitPopup = async (formEl: FormInstance | undefined) => {
             });
         }
       } else {
-        console.log("Error in Submit", fields);
+        // console.log("Error in Submit", fields);
       }
     } catch (error) {
-      console.error("On Submit Popup", error);
+      // console.error("On Submit Popup", error);
     }
   });
 };

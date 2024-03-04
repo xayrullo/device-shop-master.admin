@@ -2,6 +2,7 @@ import { defineStore } from "pinia";
 
 import { $api } from "@/core/services";
 import type { IProductPost, IProduct } from "@/core/models/product";
+import type IPersistStrategy from "@/core/models";
 
 export interface IState {
   products: IProduct[];
@@ -104,4 +105,14 @@ export const useProductStore = defineStore({
       });
     },
   },
+  // persist: {
+  //   enabled: true,
+  //   strategies: [
+  //     {
+  //       key: "productStore",
+  //       storage: sessionStorage,
+  //       paths: ["products", "queryParam", "pagination"],
+  //     },
+  //   ] as IPersistStrategy<IState>[],
+  // },
 });
