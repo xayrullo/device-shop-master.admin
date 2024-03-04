@@ -71,7 +71,7 @@
                 >
                   <template #error>
                     <div>
-                      <XJIcon icon-name="picture" icon-class="fs-4x" />
+                      <el-icon class="el-input__icon"><Picture /></el-icon>
                     </div>
                   </template>
                 </el-image>
@@ -101,16 +101,16 @@
           </template>
         </el-table-column>
         <el-table-column fixed="right" label="Action" width="100">
-          <template #default="{ data }">
+          <template #default="{ row }">
             <div class="flex gap-x-6 justify-center">
-              <div class="cursor-pointer" @click="onAction(data)">
+              <div class="cursor-pointer" @click="onAction(row)">
                 <component
                   :is="PencilSquareIcon"
                   class="hidden h-6 w-5 flex-none text-gray-400 sm:block"
                   aria-hidden="true"
                 />
               </div>
-              <div class="cursor-pointer" @click="onDelete(data)">
+              <div class="cursor-pointer" @click="onDelete(row)">
                 <component
                   :is="TrashIcon"
                   class="hidden h-6 w-5 flex-none text-red-500 sm:block"
@@ -138,6 +138,7 @@
       />
       <ProductPopup
         v-if="isActionPopup"
+        :is-popup="isActionPopup"
         :data="selectedProduct"
         @on-close="closeActionPopup"
       />
@@ -148,7 +149,8 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from "vue";
 import { useProductStore } from "@/stores/product";
-import { Search } from "@element-plus/icons-vue";
+import { useDirectoryStore } from "@/stores/directory";
+import { Search, Picture } from "@element-plus/icons-vue";
 import debounce from "lodash.debounce";
 
 import { PencilSquareIcon, TrashIcon } from "@heroicons/vue/20/solid";
@@ -157,9 +159,11 @@ import type { IProduct } from "@/core/models/product";
 import DeletePopup from "@/components/popups/Delete.vue";
 import ProductPopup from "@/components/popups/Product.vue";
 import type IResponse from "@/core/models/response";
-import { $api } from "@/core/services";
+import { MESSAGE } from "@/core/utils/constants";
+import { ElMessage } from "element-plus";
 
 const productStore = useProductStore();
+const directoryStore = useDirectoryStore();
 
 const products = computed(() => productStore.getProducts);
 const selectedProduct = ref<IProduct>();
@@ -169,12 +173,10 @@ const queryParams = ref({
   search: "",
   category: "",
 });
-const categories = ref<string[]>([]);
+const categories = computed(() => directoryStore.getCategories);
 
 onMounted(() => {
-  $api.product.getCategories().then((res) => {
-    categories.value = res;
-  });
+  directoryStore.fetchCategories();
   productStore.fetchProducts({
     limit: productStore.pagination.limit,
     skip: productStore.pagination.skip,
@@ -225,6 +227,19 @@ function onAction(item?: IProduct) {
 }
 function closeActionPopup(e: IResponse) {
   isActionPopup.value = false;
+  if (e.success) {
+    if (e.message === MESSAGE.CREATED) {
+      ElMessage({
+        message: "Successfully Created",
+        type: "success",
+      });
+    } else {
+      ElMessage({
+        message: "Successfully Updated",
+        type: "warning",
+      });
+    }
+  }
   selectedProduct.value = {} as IProduct;
 }
 function onDelete(item: IProduct) {
@@ -235,7 +250,12 @@ function closedDeletePopup(e: IResponse) {
   isDeletePopup.value = false;
   if (e.success) {
     if (selectedProduct.value)
-      productStore.deleteProduct(selectedProduct.value);
+      productStore.deleteProduct(selectedProduct.value).then(() => {
+        ElMessage({
+          message: "Successfully deleted",
+          type: "info",
+        });
+      });
     selectedProduct.value = {} as IProduct;
   }
 }

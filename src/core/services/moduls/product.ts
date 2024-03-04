@@ -33,23 +33,23 @@ export default class ApiProduct extends ApiService {
 
   create(payload: IProductPost) {
     ApiService.setHeader();
-    return ApiService.post("/products", { data: payload }).then((res) => {
+    return ApiService.post("/products/add", payload).then((res) => {
       return res.data;
     });
   }
 
   update(payload: IProductPost) {
     ApiService.setHeader();
-    return ApiService.update("/products", `${payload.id}`, {
-      data: payload,
-    }).then((res) => {
+    const id = payload.id;
+    delete payload.id;
+    return ApiService.update("/products", `${id}`, payload).then((res) => {
       return res.data;
     });
   }
 
-  delete(payload: IProduct) {
+  delete(id: number) {
     ApiService.setHeader();
-    return ApiService.delete(`/products/${payload.id}`).then((res) => {
+    return ApiService.delete(`/products/${id}`).then((res) => {
       return res.data;
     });
   }

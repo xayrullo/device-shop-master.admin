@@ -10,7 +10,7 @@
       </div>
       <div class="flex items-center justify-center 576:justify-between">
         <button
-          class="text-center mx-2.5 font-medium py-1.5 w-[130px] border-2 border-red-600 bg-red-600 text-red-950 rounded-md 576:mx-0"
+          class="text-center mx-2.5 font-medium py-1.5 w-[130px] border-2 border-red-600 bg-red-600 text-red-900 rounded-md 576:mx-0"
           @click="
             closedModal({
               code: 0,

@@ -1,120 +1,230 @@
 <template>
-  <Popup
-    @onClose="
-      closedModal({
+  <el-dialog
+    :width="400"
+    @closed="
+      onClosePopup({
         code: 0,
         success: false,
-        message: 'Canceled',
+        message: MESSAGE.CANCELED,
         data: null,
       })
     "
+    title="Product"
+    :model-value="props.isPopup"
   >
-    <template #modal_body>
-      <div class="mb-7">Lorem ipsum dolor sit amet.</div>
-      <div class="flex items-center justify-center 576:justify-between">
-        <button
-          class="text-center mx-2.5 font-medium py-1.5 w-[130px] border-2 border-gray-300 bg-gray-300 rounded-md 576:mx-0"
+    <el-form
+      ref="productRef"
+      :model="product"
+      :rules="rules"
+      label-position="top"
+      @submit.prevent="onSubmitPopup(productRef)"
+    >
+      <el-form-item label="Category" prop="category">
+        <el-select
+          v-model="product.category"
+          placeholder="Select category"
+          clearable
+        >
+          <el-option
+            v-for="item in categories"
+            :key="item"
+            :label="item"
+            :value="item"
+          />
+        </el-select>
+      </el-form-item>
+      <el-form-item label="Brand" prop="brand">
+        <el-input v-model="product.brand" />
+      </el-form-item>
+      <el-form-item label="Title" prop="title">
+        <el-input v-model="product.title" />
+      </el-form-item>
+      <el-form-item label="Description" prop="description">
+        <el-input v-model="product.description" type="textarea" />
+      </el-form-item>
+      <el-form-item label="Price" prop="price">
+        <el-input
+          v-model="product.price"
+          type="number"
+          min="0"
+          class="no-arrows"
+        />
+      </el-form-item>
+      <el-form-item label="Stock" prop="stock">
+        <el-input
+          v-model="product.stock"
+          type="number"
+          min="0"
+          class="no-arrows"
+        />
+      </el-form-item>
+    </el-form>
+    <template #footer>
+      <div class="dialog-footer">
+        <el-button
           @click="
-            closedModal({
+            onClosePopup({
               code: 0,
-              success: true,
-              message: 'Successfully Delete',
+              success: false,
+              message: MESSAGE.CANCELED,
               data: null,
             })
           "
         >
           Cancel
-        </button>
-        <button
-          class="text-center mx-2.5 font-medium py-2 w-[130px] bg-green-300 text-green-950 rounded-md 576:mx-0"
-          @click="onSave()"
+        </el-button>
+        <el-button
+          type="primary"
+          :disabled="isSameWithOldValue"
+          @click="onSubmitPopup(productRef)"
         >
-          Save
-        </button>
+          {{ product.id ? "Update" : "Save" }}
+        </el-button>
       </div>
     </template>
-  </Popup>
+  </el-dialog>
 </template>
 
 <script setup lang="ts">
-import * as Yup from "yup";
-import { ValidationError } from "yup";
+import { ref, watch, computed } from "vue";
+import { MESSAGE } from "@/core/utils/constants";
+
+import { ElMessage, type FormInstance, type FormRules } from "element-plus";
+import type { IProductPost, IProduct } from "@/core/models/product";
+
+import { useDirectoryStore } from "@/stores/directory";
+import { useProductStore } from "@/stores/product";
 import type IResponse from "@/core/models/response";
 
-import Popup from "../Popup.vue";
-import { ref, computed, onMounted } from "vue";
+const directoryStore = useDirectoryStore();
+const productStore = useProductStore();
 
-const emits = defineEmits(["onClose"]);
-
-const errors = ref({
-  amount: "",
-  itemName: "",
+const props = defineProps<{
+  isPopup: boolean;
+  data: IProduct | undefined;
+}>();
+const categories = computed(() => directoryStore.getCategories);
+const productRef = ref<FormInstance>();
+const product = ref<IProductPost>({
+  title: "",
+  description: "",
+  price: null,
+  stock: null,
+  brand: "",
   category: "",
-  type: "",
+  images: [],
+  view: true,
 });
-const validationSchema = Yup.object().shape({
-  amount: Yup.number().required("Amount required"),
-  itemName: Yup.string().required("Description required"),
-  category: Yup.string().required("Category required"),
-  type: Yup.string().required("Type required"),
-});
-// function validateField(key) {
-//   validationSchema
-//     .validateAt(key, transaction.value)
-//     .then(() => {
-//       errors.value[key] = "";
-//     })
-//     .catch((error) => {
-//       errors.value[key] = error.message;
-//     });
-// }
-// if (props.data) {
-//   transaction.value = JSON.parse(JSON.stringify(props.data));
-// } else {
-//   clearData();
-// }
-// function clearData() {
-//   transaction.value = {
-//     _id: "",
-//     amount: null,
-//     expenseDate: new Date().toString(),
-//     itemName: "",
-//     category: "",
-//     type: "",
-//   };
-// }
-onMounted(() => {
-  //   categoryStore.fetchCategories();
+const isSameWithOldValue = ref(false);
+const rules = ref<FormRules>({
+  title: {
+    required: true,
+    message: "Required field",
+    trigger: "blur",
+  },
+  price: {
+    required: true,
+    message: "Required field",
+    trigger: "blur",
+  },
+  brand: {
+    required: true,
+    message: "Required field",
+    trigger: "blur",
+  },
+  category: {
+    required: true,
+    message: "Required field",
+    trigger: "blur",
+  },
 });
 
-async function onSave() {
-  //   try {
-  //     await validationSchema.validate(transaction.value, { abortEarly: false });
-  //     if (transaction.value._id) {
-  //       transactionStore.updateTransaction(transaction.value);
-  //       closedModal({
-  //         code: 0,
-  //         success: true,
-  //         message: "UPDATED",
-  //         data: transaction.value,
-  //       });
-  //     } else {
-  //       transactionStore.addTransaction(transaction.value);
-  //       closedModal({
-  //         code: 0,
-  //         success: true,
-  //         message: "ADDED",
-  //         data: transaction.value,
-  //       });
-  //     }
-  //   } catch (error) {
-  //     if (error instanceof ValidationError)
-  //       error.inner.forEach((err: ValidationError) => {
-  //         errors.value[err.path ?? ""] = err.message;
-  //       });
-  //   }
+watch(
+  () => product.value,
+  () => {
+    if (JSON.stringify(product.value) === JSON.stringify(props.data))
+      isSameWithOldValue.value = true;
+    else isSameWithOldValue.value = false;
+  },
+  { deep: true },
+);
+
+if (props.data) {
+  product.value = JSON.parse(JSON.stringify(props.data));
+} else {
+  clearData();
 }
-function closedModal(e: IResponse) {
+
+function clearData() {
+  product.value = {
+    title: "",
+    description: "",
+    price: null,
+    stock: null,
+    brand: "",
+    category: "",
+    images: [],
+    view: true,
+  };
+}
+const emits = defineEmits(["onSubmit", "onClose"]);
+const onSubmitPopup = async (formEl: FormInstance | undefined) => {
+  if (!formEl) return;
+  await formEl.validate((valid, fields) => {
+    try {
+      if (valid) {
+        if (product.value.id) {
+          productStore
+            .updateProduct(product.value)
+            .then((res) => {
+              onClosePopup({
+                code: 0,
+                success: true,
+                message: MESSAGE.UPDATED,
+                data: res,
+              });
+            })
+            .catch((err) => {
+              ElMessage({
+                message: "Something Wrong",
+                type: "error",
+              });
+            });
+        } else {
+          productStore
+            .createProduct(product.value)
+            .then((res) => {
+              onClosePopup({
+                code: 0,
+                success: true,
+                message: MESSAGE.CREATED,
+                data: res,
+              });
+            })
+            .catch((err) => {
+              ElMessage({
+                message: "Something Wrong",
+                type: "error",
+              });
+            });
+        }
+      } else {
+        console.log("Error in Submit", fields);
+      }
+    } catch (error) {
+      console.error("On Submit Popup", error);
+    }
+  });
+};
+function onClosePopup(e: IResponse) {
   emits("onClose", e);
 }
 </script>
+
+<style scoped>
+.no-arrows .el-input__inner::-webkit-inner-spin-button,
+.no-arrows .el-input__inner::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+</style>

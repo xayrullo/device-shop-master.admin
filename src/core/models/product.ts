@@ -1,6 +1,5 @@
 export interface IProduct extends IProductPost {
   id: number;
-  createdAt: string;
 }
 
 export interface IProductBody {
@@ -14,8 +13,8 @@ export interface IProductPost {
   id?: number;
   title: string;
   description: string;
-  price: number;
-  stock: number;
+  price: number | null;
+  stock: number | null;
   brand: string;
   category: string;
   images: string[];

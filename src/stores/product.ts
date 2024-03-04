@@ -68,27 +68,40 @@ export const useProductStore = defineStore({
           });
       }
     },
-    // addProduct(e: IProductPost) {
-    //   this.products.push({
-    //     ...e,
-    //     _id: "23143214321n23l14231",
-    //     isDeleted: false,
-    //     amount: Number(e.amount),
-    //   });
-    // },
-    // updateProduct(e: IProductPost) {
-    //   const index = this.products.findIndex((ind) => ind._id === e._id);
-    //   if (index > -1)
-    //     this.products.splice(index, 1, {
-    //       ...e,
-    //       _id: e._id ? e._id : "",
-    //       isDeleted: false,
-    //       amount: Number(e.amount),
-    //     });
-    // },
+    createProduct(e: IProductPost) {
+      return new Promise((resolve, reject) => {
+        $api.product
+          .create(e)
+          .then((res) => {
+            this.products.unshift(res);
+            resolve(res);
+          })
+          .catch((err) => reject(err));
+      });
+    },
+    updateProduct(e: IProductPost) {
+      return new Promise((resolve, reject) => {
+        $api.product
+          .update(e)
+          .then((res) => {
+            const index = this.products.findIndex((ind) => ind.id === res.id);
+            if (index > -1) this.products.splice(index, 1, res);
+            resolve(res);
+          })
+          .catch((err) => reject(err));
+      });
+    },
     deleteProduct(item: IProduct) {
-      const index = this.products.findIndex((ind) => ind.id === item.id);
-      if (index > -1) this.products.splice(index, 1);
+      return new Promise((resolve, reject) => {
+        $api.product
+          .delete(item.id)
+          .then((res) => {
+            const index = this.products.findIndex((ind) => ind.id === item.id);
+            if (index > -1) this.products.splice(index, 1);
+            resolve(item);
+          })
+          .catch((err) => reject(err));
+      });
     },
   },
 });
