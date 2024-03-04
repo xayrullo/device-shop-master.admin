@@ -16,6 +16,7 @@
   "dependencies": {
     "@headlessui/vue": "^1.7.19",
     "@heroicons/vue": "^2.1.1",
+    "@vue/test-utils": "^2.4.4",
     "axios": "^1.6.7",
     "element-plus": "^2.6.0",
     "env-cmd": "^10.1.0",
